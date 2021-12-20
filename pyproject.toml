@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "rifqy-olx-scraping"
+version = "0.1.0"
+description = ""
+authors = ["Agung Wiyono <wiyonoagung1@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2.26.0"
+requests-html = "^0.10.0"
+Scrapy = "^2.5.1"
+scrapy-user-agents = "^0.1.1"
+selenium = "^4.1.0"
+
+[tool.poetry.dev-dependencies]
+ipython = "^7.30.0"
+black = "^21.11b1"
+flake8 = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
