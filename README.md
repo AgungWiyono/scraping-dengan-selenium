@@ -26,25 +26,18 @@ Software yang dibutuhkan antara lain:
 
 ## Cara Menjalankan
 
-Ada 2 step berbeda, step pertama adalah untuk mendapatkan id user sedangkan 
-step kedua adalah untuk mendapatkan data user itu sendiri. Result dari step pertama 
-adalah file-file json yang berisi user id. Sedangkan isi step kedua adalah 
-file json berisi data-data user.
-
-Menjalankan step 1:
-
 1. Aktifkan virtual environment
 2. Masuk ke folder project
-3. Jalankan `python id_getter.py 'kata kunci'`
-4. Program akan berjalan sembari menuliskan user_id di setiap 5 halaman pada folder user_ids.
-5. Fitur untuk membatasi halaman mulai dan halaman akhir yang ingin discrape akan ditambahkan.
+3. Jalankan `python scraper.py`
+4. Akan muncul dialog untuk 
+	1. Keyword pencarian
+	2. Halaman mulai pencarian (isikan 0 untuk halaman paling awal)
+	3. Halaman akhir yang ingin discrape (isikan 0 untuk tanpa batas)
+5. Browser akan terbuka, lakukan login dan kembali ke konsol
+6. Isikan n bila login gagal, y bila login berhasil
+7. Bila diisi selain y, maka program akan berhenti
 
-Menjalankan step 2:
-
-1. Aktifkan virtual environment
-2. Masuk ke folder project
-3. Jalankan `python data_getter.py file_berisi_user_id.json`
-4. Akan muncul kotak dialog yang menanyakan apakah login berhasil dan juga muncul firefox browser yang mengunjungi alamat olx.co.id
-5. Login pada halaman olx dengan metode email dan password, jika berhasil jawab **y** pada dialog di konsol, selain itu **n**
-6. Hasilnya akan muncul sebagai file json dengan nama file berformat result_datetime.json
-7. Akan dilakukan perbaikan untuk penamaan file dan jenis file untuk ekspor hasil
+Bila diisi y maka program akan berjalan melakukan scraping mulai dari halaman
+yang awal sampai batas yang ditentukan. Atau bila ada kegagalan, maka script
+akan menyimpan result dari halaman-halaman yang telah berhasil di-scrape
+dan menampilkan log tentang halaman yang gagal di scrape.
