@@ -1,6 +1,8 @@
+import os
 import json
 import time
 import random
+import logging
 
 from csv import DictWriter
 from typing import Any, Dict, List, Union
@@ -9,18 +11,33 @@ from urllib.parse import urlencode
 from selenium import webdriver
 from requests_html import HTMLSession
 
+if not os.path.exists("logs"):
+    os.mkdir("logs")
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    filename="logs/scraper.log",
+    filemode="w",
+)
+
 
 def get_page_data(url: str) -> Union[Dict[str, Any], None]:
-    print(f"Hitting {url}")
+    logger.info(f"Hitting {url}")
 
     session = HTMLSession()
     resp = session.get(url)
+    if resp.status_code == 404:
+        logger.info("Proses Scraping telah sampai pada halaman akhir.")
+        return None
     if resp.status_code != 200:
+        logger.info(json.dumps(resp.json()))
         return None
 
     jsondata = resp.json()
 
     if not jsondata.get("data"):
+        logger.info("Elemen Data tidak ditemukan")
         return None
 
     time.sleep(random.randint(1, 3))
@@ -58,12 +75,14 @@ def browser_get_data(
     browser.get(url)
     elements = browser.find_elements("tag name", "pre")
     if not elements:
+        logger.info("Elemen pre tidak ditemukan.")
         return None
 
     jsontext = elements[0].text
     jsondata = json.loads(jsontext)
 
     if not jsondata.get("data"):
+        logger.info("Elemen data pada data user tidak ditemukan.")
         return None
 
     time.sleep(random.randint(1, 3))
@@ -96,7 +115,7 @@ def userdata_getter(
 
 def scrape_data():
     keyword = input("Masukkan kata kunci: ")
-    startpage = int(input("Masukkan halaman mulai (minimal 0): "))
+    startpage = int(input("Masukkan halaman mulai (minimal 0): ") or 0)
     endpage = int(
         input(
             (
@@ -104,6 +123,7 @@ def scrape_data():
                 "(0 berrati tanpa batas): "
             )
         )
+        or 0
     )
 
     print("Browser akan terbuka.")
@@ -120,6 +140,7 @@ def scrape_data():
     while True:
         if endpage > 0:
             if page > endpage:
+                logger.info("Ending Scraping Process")
                 break
 
         try:
@@ -136,7 +157,6 @@ def scrape_data():
             print(f"Gagal mengambil data untuk user pada halaman {page}")
             print(e)
             browser.close()
-            return
 
         userdata.extend(usertempdata)
         page += 1
