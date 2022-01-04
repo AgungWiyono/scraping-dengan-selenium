@@ -103,12 +103,14 @@ def browser_get_data(
 
 
 def userdata_getter(
-    browser: webdriver.Firefox, userid_list: List[str]
+    browser: webdriver.Firefox, userid_list: List[str], existing_ids: List[str]
 ) -> List[Dict[str, str]]:
     tempdata = []
     base_url = "view-source:https://www.olx.co.id/api/users/"
 
     for userid in userid_list:
+        if userid in existing_ids:
+            continue
         url = base_url + userid
         userdata = browser_get_data(browser, url)
         if not userdata:
@@ -116,6 +118,7 @@ def userdata_getter(
 
         tempdata.append(
             {
+                "id": userdata["id"],
                 "name": userdata["name"],
                 "phone": userdata["phone"],
                 "verified": userdata["verification_status"],
@@ -191,10 +194,10 @@ def scrape_data():
         return
 
     page = startpage
-    headers = ["name", "phone", "verified", "about", "url"]
+    headers = ["id", "name", "phone", "verified", "about", "url"]
     userdata = tablib.Dataset()
     userdata.headers = headers
-    userphone_exists = []
+    userid_exists = []
 
     state = True
     while state:
@@ -215,7 +218,7 @@ def scrape_data():
             break
 
         try:
-            usertempdata = userdata_getter(browser, userids)
+            usertempdata = userdata_getter(browser, userids, userid_exists)
         except KeyboardInterrupt:
             print("Proses dihentikan")
         except Exception as e:
@@ -225,8 +228,8 @@ def scrape_data():
             state = False
 
         for row in usertempdata:
-            if row["phone"] not in userphone_exists:
-                userphone_exists.append(row["phone"])
+            if row["id"] not in userid_exists:
+                userid_exists.append(row["id"])
                 userdata.append(row.values())
         page += 1
 
