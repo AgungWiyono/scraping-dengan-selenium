@@ -11,6 +11,7 @@ requests-html = "^0.10.0"
 Scrapy = "^2.5.1"
 scrapy-user-agents = "^0.1.1"
 selenium = "^4.1.0"
+tablib = {extras = ["xlsx"], version = "^3.1.0"}
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.30.0"
