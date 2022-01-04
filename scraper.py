@@ -40,13 +40,15 @@ def get_page_data(url: str) -> Union[Dict[str, Any], None]:
         logger.info("Proses Scraping telah sampai pada halaman akhir.")
         return None
     if resp.status_code != 200:
+        logger.error("Gagal mendapatkan data halaman.")
         logger.info(json.dumps(resp.json()))
         return None
 
     jsondata = resp.json()
 
     if not jsondata.get("data"):
-        logger.info("Elemen Data tidak ditemukan")
+        logger.error("Elemen Data tidak ditemukan")
+        logger.info(json.dumps(jsondata))
         return None
 
     time.sleep(random.randint(1, 3))
@@ -84,14 +86,16 @@ def browser_get_data(
     browser.get(url)
     elements = browser.find_elements("tag name", "pre")
     if not elements:
-        logger.info("Elemen pre tidak ditemukan.")
+        logger.error("Elemen pre tidak ditemukan.")
+        logger.info(browser.page_source())
         return None
 
     jsontext = elements[0].text
     jsondata = json.loads(jsontext)
 
     if not jsondata.get("data"):
-        logger.info("Elemen data pada data user tidak ditemukan.")
+        logger.error("Elemen data pada data user tidak ditemukan.")
+        logger.info(json.dumps(jsondata))
         return None
 
     time.sleep(random.randint(1, 3))
@@ -229,7 +233,10 @@ def scrape_data():
     filename = f"result_page_{startpage}_to_{page-1}.xlsx"
     with open(filename, "wb") as f:
         f.write(userdata.export("xlsx"))
-    browser.close()
+    try:
+        browser.close()
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":
