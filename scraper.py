@@ -91,7 +91,12 @@ def browser_get_data(
         return None
 
     jsontext = elements[0].text
-    jsondata = json.loads(jsontext)
+    try:
+        jsondata = json.loads(jsontext)
+    except Exception as e:
+        logger.info("Gagal saat load json")
+        logger.info(jsontext)
+        logger.exception(e)
 
     if not jsondata.get("data"):
         logger.error("Elemen data pada data user tidak ditemukan.")
@@ -126,6 +131,7 @@ def userdata_getter(
                 "url": url[12:],
             }
         )
+    browser.get("https://www.olx.co.id/")
     return tempdata
 
 
@@ -210,11 +216,9 @@ def scrape_data():
             userids = id_getter(keyword, page, location_id)
         except Exception as e:
             print(f"Gagal mengambil data untuk halaman {page}")
-            print(e)
+            logger.exception(e)
             browser.close()
             state = False
-
-        if not state:
             break
 
         try:
@@ -223,9 +227,10 @@ def scrape_data():
             print("Proses dihentikan")
         except Exception as e:
             print(f"Gagal mengambil data untuk user pada halaman {page}")
-            print(e)
+            logger.exception(e)
             browser.close()
             state = False
+            break
 
         for row in usertempdata:
             if row["id"] not in userid_exists:
