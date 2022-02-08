@@ -206,37 +206,41 @@ def scrape_data():
     userid_exists = []
 
     state = True
-    while state:
-        if endpage > 0:
-            if page > endpage:
-                logger.info("Ending Scraping Process")
+    try:
+        while state:
+            if endpage > 0:
+                if page > endpage:
+                    logger.info("Ending Scraping Process")
+                    break
+
+            try:
+                userids = id_getter(keyword, page, location_id)
+            except Exception as e:
+                print(f"Gagal mengambil data untuk halaman {page}")
+                logger.exception(e)
+                browser.close()
+                state = False
                 break
 
-        try:
-            userids = id_getter(keyword, page, location_id)
-        except Exception as e:
-            print(f"Gagal mengambil data untuk halaman {page}")
-            logger.exception(e)
-            browser.close()
-            state = False
-            break
+            try:
+                usertempdata = userdata_getter(browser, userids, userid_exists)
+            except KeyboardInterrupt:
+                print("Proses dihentikan")
+                break
+            except Exception as e:
+                print(f"Gagal mengambil data untuk user pada halaman {page}")
+                logger.exception(e)
+                browser.close()
+                state = False
+                break
 
-        try:
-            usertempdata = userdata_getter(browser, userids, userid_exists)
-        except KeyboardInterrupt:
-            print("Proses dihentikan")
-        except Exception as e:
-            print(f"Gagal mengambil data untuk user pada halaman {page}")
-            logger.exception(e)
-            browser.close()
-            state = False
-            break
-
-        for row in usertempdata:
-            if row["id"] not in userid_exists:
-                userid_exists.append(row["id"])
-                userdata.append(row.values())
-        page += 1
+            for row in usertempdata:
+                if row["id"] not in userid_exists:
+                    userid_exists.append(row["id"])
+                    userdata.append(row.values())
+            page += 1
+    except KeyboardInterrupt:
+        print("Proses dihentikan")
 
     filename = f"result_page_{startpage}_to_{page-1}.xlsx"
     with open(filename, "wb") as f:
