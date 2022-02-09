@@ -123,12 +123,12 @@ def userdata_getter(
 
         tempdata.append(
             {
-                "id": userdata["id"],
                 "name": userdata["name"],
                 "phone": userdata["phone"],
                 "verified": userdata["verification_status"],
                 "about": userdata["about"],
                 "url": url[12:],
+                "id": userdata["id"],
             }
         )
     browser.get("https://www.olx.co.id/")
